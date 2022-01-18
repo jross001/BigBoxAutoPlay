@@ -103,7 +103,7 @@ To only select from games marked as favorite within the specified playlist, set 
 When the AutoPlayType is set to "SpecificGame", the plug-in will select the game that has the specified title in the specified platform.  Enter both the name of a platform in the Platform setting and the title of the game in the GameTitle setting.  For instance, if you want to automatically launch into "Super Mario Bros." from the "Nintendo Entertainment System" platform, your settings file should look like: 
 ```json
 {
-  "AutoPlayType": "RandomGameFromPlatform",
+  "AutoPlayType": "SpecificGame",
   "OnlyFavorites": false,
   "Playlist": "",
   "Platform": "Nintendo Entertainment System",

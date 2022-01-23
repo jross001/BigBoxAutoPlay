@@ -24,7 +24,7 @@ namespace BigBoxAutoPlay.DataAccess
 
                 BigBoxAutoPlaySettings bigBoxAutoPlaySettings = new BigBoxAutoPlaySettings()
                 {
-                    BoxAutoPlayType = BigBoxAutoPlayType.RandomGame,
+                    AutoPlayType = BigBoxAutoPlayType.Off,
                     OnlyFavorites = false,
                     Platform = "",
                     Playlist = "",

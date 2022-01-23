@@ -24,7 +24,7 @@ namespace BigBoxAutoPlay.AutoPlayers
                 return;
             }
 
-            IEnumerable<IGame> gamesQuery = playlist.GetAllGames(false);
+            IEnumerable<IGame> gamesQuery = playlist.GetAllGames(false).Where(g => !g.Broken && !g.Hide);
 
             if (bigBoxAutoPlaySettings.OnlyFavorites)
             {

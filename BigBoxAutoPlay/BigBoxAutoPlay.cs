@@ -13,7 +13,6 @@ namespace BigBoxAutoPlay
             switch(eventType)
             {
                 case SystemEventTypes.BigBoxStartupCompleted:
-                    
                     try
                     {
                         IBigBoxAutoPlayer bigBoxAutoPlayer = BigBoxAutoPlayer.GetBigBoxAutoPlayer();

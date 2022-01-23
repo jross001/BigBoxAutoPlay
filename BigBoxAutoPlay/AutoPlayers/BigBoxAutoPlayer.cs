@@ -21,7 +21,7 @@ namespace BigBoxAutoPlay.AutoPlayers
 
             BigBoxAutoPlaySettings bigBoxAutoPlaySettings = DataService.GetSettings();
 
-            switch(bigBoxAutoPlaySettings.BoxAutoPlayType)
+            switch(bigBoxAutoPlaySettings.AutoPlayType)
             {
                 case BigBoxAutoPlayType.RandomGame:
                     bigBoxAutoPlayer = new BigBoxAutoPlayerRandomGame(bigBoxAutoPlaySettings);

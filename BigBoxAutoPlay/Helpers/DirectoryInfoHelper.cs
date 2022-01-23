@@ -47,19 +47,6 @@ namespace BigBoxAutoPlay.Helpers
             }
         }
 
-        private string dataFolder;
-        public string Datafolder
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(dataFolder))
-                {
-                    dataFolder = $"{PluginFolder}\\Data";
-                }
-                return dataFolder;
-            }
-        }
-
         private string settingsFile;
         public string SettingsFile
         {
@@ -67,7 +54,7 @@ namespace BigBoxAutoPlay.Helpers
             {
                 if (string.IsNullOrWhiteSpace(settingsFile))
                 {
-                    settingsFile = $"{Datafolder}\\settings.json";
+                    settingsFile = $"{PluginFolder}\\settings.json";
                 }
                 return settingsFile;
             }
@@ -76,7 +63,6 @@ namespace BigBoxAutoPlay.Helpers
         public static void CreateFolders()
         {
             CreateFolder(Instance.PluginFolder);
-            CreateFolder(Instance.Datafolder);
         }
 
         public static void CreateFolder(string path)

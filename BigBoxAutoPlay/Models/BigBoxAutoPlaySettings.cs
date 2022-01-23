@@ -2,7 +2,7 @@
 {
     public class BigBoxAutoPlaySettings
     {
-        public string BoxAutoPlayType { get; set; }
+        public string AutoPlayType { get; set; }
         public bool OnlyFavorites { get; set; }
         public string Playlist { get; set; }
         public string Platform { get; set; }

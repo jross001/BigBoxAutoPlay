@@ -15,9 +15,9 @@ namespace BigBoxAutoPlay.AutoPlayers
 
         public override void AutoPlay()
         {
-            IEnumerable<IGame> gamesQuery = PluginHelper.DataManager.GetAllGames();
+            IEnumerable<IGame> gamesQuery = PluginHelper.DataManager.GetAllGames().Where(g => !g.Broken && !g.Hide);
 
-            if(bigBoxAutoPlaySettings.OnlyFavorites)
+            if (bigBoxAutoPlaySettings.OnlyFavorites)
             {
                 gamesQuery = gamesQuery.Where(g => g.Favorite);
             }

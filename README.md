@@ -18,6 +18,7 @@ When BigBox loads for the first time, a settings file will be created that will 
   "Playlist": "",
   "Platform": "",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
 
@@ -36,6 +37,7 @@ When the AutoPlayType is set to "RandomGame", the plug-in will select a random g
   "Playlist": "",
   "Platform": "",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
 
@@ -48,6 +50,7 @@ When the AutoPlayType is set to "RandomFavorite", the plug-in will select a rand
   "Playlist": "",
   "Platform": "",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
 
@@ -60,6 +63,7 @@ When the AutoPlayType is set to "RandomGameFromPlaylist", the plug-in will selec
   "Playlist": "My top 100 games",
   "Platform": "",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
 
@@ -72,6 +76,7 @@ To only select from games marked as favorite within the specified playlist, set 
   "Playlist": "My top 100 games",
   "Platform": "",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
 
@@ -84,6 +89,7 @@ When the AutoPlayType is set to "RandomGameFromPlatform", the plug-in will selec
   "Playlist": "",
   "Platform": "Nintendo Entertainment System",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
 
@@ -96,6 +102,7 @@ To only select from games marked as favorite within the specified playlist, set 
   "Playlist": "",
   "Platform": "Nintendo Entertainment System",
   "GameTitle": ""
+  "DelayInSeconds": "2"
 }
 ```
   
@@ -108,8 +115,12 @@ When the AutoPlayType is set to "SpecificGame", the plug-in will select the game
   "Playlist": "",
   "Platform": "Nintendo Entertainment System",
   "GameTitle": "Super Mario Bros."
+  "DelayInSeconds": "2"
 }
 ```
   
 ### "OnlyFavorites"
 Enter either "true" or "false".  This setting can be used along with the AutoPlayTypes of "RandomGameFromPlatform" and "RandomGameFromPlaylist".  If "false" then the random selection will pick any game for the specified platform/playlist.  If "true" then the random selection will only pick from games in the specified platform/playlist if they are flagged as favorites.
+
+### "DelayInSeconds"
+Enter the number of seconds to delay before launching the game.  When a startup video is used with BigBox, this delay can help the auto played game from launching behind BigBox by giving BigBox a chance to fully initialize before launching the game.

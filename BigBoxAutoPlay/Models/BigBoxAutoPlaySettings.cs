@@ -7,5 +7,6 @@
         public string Playlist { get; set; }
         public string Platform { get; set; }
         public string GameTitle { get; set; }
+        public int DelayInSeconds { get; set; }
     }
 }

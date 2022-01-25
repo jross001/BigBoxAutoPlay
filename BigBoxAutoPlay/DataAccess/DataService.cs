@@ -28,7 +28,8 @@ namespace BigBoxAutoPlay.DataAccess
                     OnlyFavorites = false,
                     Platform = "",
                     Playlist = "",
-                    GameTitle = ""
+                    GameTitle = "", 
+                    DelayInSeconds = 2
                 };
 
                 // save the file 

@@ -144,6 +144,7 @@ namespace BigBoxAutoPlay.ViewModels
         private void InitializeSettings()
         {
             Enabled = bigBoxAutoPlaySettings.Enabled.GetValueOrDefault();
+            SelectGame = bigBoxAutoPlaySettings.SelectGame.GetValueOrDefault();
             OnlyFavorites = bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault();
             IncludeHidden = bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault();
             IncludeBroken = bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault();                                    
@@ -230,6 +231,16 @@ namespace BigBoxAutoPlay.ViewModels
             {
                 bigBoxAutoPlaySettings.Enabled = value;
                 OnPropertyChanged("Enabled");
+            }
+        }
+
+        public bool SelectGame
+        {
+            get => bigBoxAutoPlaySettings?.SelectGame == true;
+            set
+            {
+                bigBoxAutoPlaySettings.SelectGame = value;
+                OnPropertyChanged("SelectGame");
             }
         }
 

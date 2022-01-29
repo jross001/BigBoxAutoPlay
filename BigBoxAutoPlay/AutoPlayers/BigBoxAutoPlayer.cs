@@ -14,46 +14,47 @@ namespace BigBoxAutoPlay.AutoPlayers
     {
         public static void AutoPlay(BigBoxAutoPlaySettings bigBoxAutoPlaySettings)
         {
+            autoPlayGame = null;
+
             // shouldn't be called but check just in case 
-            if(!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
+            if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
 
             IEnumerable<IGame> gamesQuery = PluginHelper.DataManager.GetAllGames();
-
-            if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlaylist))
-            {
-                // todo: start from playlist games 
-                IEnumerable<IPlaylist> allPlaylistsQuery = PluginHelper.DataManager.GetAllPlaylists();
-                IPlaylist playlist = allPlaylistsQuery.FirstOrDefault(p => p.PlaylistId == bigBoxAutoPlaySettings.FromPlaylist);
-
-                gamesQuery = playlist.GetAllGames(false);
-            }
-
-            if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlatform))
-            {
-                gamesQuery = gamesQuery.Where(g => g.Platform == bigBoxAutoPlaySettings.FromPlatform);
-            }
 
             if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.SpecificGameId))
             {
                 gamesQuery = gamesQuery.Where(g => g.Id == bigBoxAutoPlaySettings.SpecificGameId);
             }
-
-            if (bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault())
+            else
             {
-                gamesQuery = gamesQuery.Where(g => g.Favorite);
-            }
+                if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlaylist))
+                {
+                    IEnumerable<IPlaylist> allPlaylistsQuery = PluginHelper.DataManager.GetAllPlaylists();
+                    IPlaylist playlist = allPlaylistsQuery.FirstOrDefault(p => p.PlaylistId == bigBoxAutoPlaySettings.FromPlaylist);
 
-            if (!bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault())
-            {
-                gamesQuery = gamesQuery.Where(g => !g.Broken);
-            }
+                    gamesQuery = playlist.GetAllGames(false);
+                }
 
-            if (!bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault())
-            {
-                gamesQuery = gamesQuery.Where(g => !g.Hide);
-            }
+                if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlatform))
+                {
+                    gamesQuery = gamesQuery.Where(g => g.Platform == bigBoxAutoPlaySettings.FromPlatform);
+                }
 
-            autoPlayGame = null;
+                if (bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault())
+                {
+                    gamesQuery = gamesQuery.Where(g => g.Favorite);
+                }
+
+                if (!bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault())
+                {
+                    gamesQuery = gamesQuery.Where(g => !g.Broken);
+                }
+
+                if (!bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault())
+                {
+                    gamesQuery = gamesQuery.Where(g => !g.Hide);
+                }
+            }
 
             if(gamesQuery.Count() > 1)
             {
@@ -70,11 +71,21 @@ namespace BigBoxAutoPlay.AutoPlayers
             
             if(autoPlayGame != null)
             {
-                // filter to find the game 
-                PluginHelper.BigBoxMainViewModel.ShowGame(autoPlayGame, FilterType.None);
+                if(bigBoxAutoPlaySettings.SelectGame.GetValueOrDefault())
+                {
+                    // filter to find the game 
+                    PluginHelper.BigBoxMainViewModel.ShowGame(autoPlayGame, FilterType.None);
 
-                // launch the game 
-                PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
+                    BackgroundWorker backgroundWorker = new BackgroundWorker();
+                    backgroundWorker.DoWork += DoBackgroundDelay;
+                    backgroundWorker.RunWorkerCompleted += DoAutoPlay;
+                    backgroundWorker.RunWorkerAsync();
+                }
+                else
+                {
+                    // launch the game 
+                    PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
+                }
             }
         }
 
@@ -84,13 +95,14 @@ namespace BigBoxAutoPlay.AutoPlayers
         {
             if (autoPlayGame != null)
             {
-                
+                // launch the game 
+                PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
             }
         }
 
         private static void DoBackgroundDelay(object sender, DoWorkEventArgs e)
         {
-            Thread.Sleep(2000);
+            Thread.Sleep(8000);
         }
     }
 }

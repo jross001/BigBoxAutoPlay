@@ -2,7 +2,8 @@
 {
     public class BigBoxAutoPlaySettings
     {
-        public bool? Enabled { get; set; }        
+        public bool? Enabled { get; set; }
+        public bool? SelectGame { get; set; }
         public bool? OnlyFavorites { get; set; }
         public bool? IncludeHidden { get; set; }
         public bool? IncludeBroken { get; set; }        

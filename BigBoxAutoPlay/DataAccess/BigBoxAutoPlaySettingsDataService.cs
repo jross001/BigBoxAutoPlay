@@ -32,6 +32,7 @@ namespace BigBoxAutoPlay.DataAccess
                 BigBoxAutoPlaySettings bigBoxAutoPlaySettings = new BigBoxAutoPlaySettings()
                 {
                     Enabled = false,
+                    SelectGame = false,
                     OnlyFavorites = false,
                     IncludeHidden = false,
                     IncludeBroken = false,

@@ -1,60 +1,96 @@
 ﻿using BigBoxAutoPlay.DataAccess;
 using BigBoxAutoPlay.Models;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using Unbroken.LaunchBox.Plugins;
+using Unbroken.LaunchBox.Plugins.Data;
 
 namespace BigBoxAutoPlay.AutoPlayers
 {
-    public abstract class BigBoxAutoPlayer : IBigBoxAutoPlayer
+    public class BigBoxAutoPlayer
     {
-        protected readonly BigBoxAutoPlaySettings bigBoxAutoPlaySettings;
-        protected Random random;
-
-        protected BigBoxAutoPlayer(BigBoxAutoPlaySettings _bigBoxAutoPlaySettings)
+        public static void AutoPlay(BigBoxAutoPlaySettings bigBoxAutoPlaySettings)
         {
-            bigBoxAutoPlaySettings = _bigBoxAutoPlaySettings;
-            random = new Random(Guid.NewGuid().GetHashCode());
-        }
+            // shouldn't be called but check just in case 
+            if(!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
 
-        public static IBigBoxAutoPlayer GetBigBoxAutoPlayer()
-        {
-            IBigBoxAutoPlayer bigBoxAutoPlayer;
+            IEnumerable<IGame> gamesQuery = PluginHelper.DataManager.GetAllGames();
 
-            BigBoxAutoPlaySettings bigBoxAutoPlaySettings = DataService.GetSettings();
-
-            switch(bigBoxAutoPlaySettings.AutoPlayType)
+            if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlaylist))
             {
-                case BigBoxAutoPlayType.RandomGame:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerRandomGame(bigBoxAutoPlaySettings);
-                    break;
+                // todo: start from playlist games 
+                IEnumerable<IPlaylist> allPlaylistsQuery = PluginHelper.DataManager.GetAllPlaylists();
+                IPlaylist playlist = allPlaylistsQuery.FirstOrDefault(p => p.PlaylistId == bigBoxAutoPlaySettings.FromPlaylist);
 
-                case BigBoxAutoPlayType.RandomFavorite:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerRandomFavorite(bigBoxAutoPlaySettings);
-                    break;
-
-                case BigBoxAutoPlayType.RandomGameFromPlatform:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerRandomGameFromPlatform(bigBoxAutoPlaySettings);
-                    break;
-
-                case BigBoxAutoPlayType.RandomGameFromPlaylist:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerRandomGameFromPlaylist(bigBoxAutoPlaySettings);
-                    break;
-
-                case BigBoxAutoPlayType.SpecificGame:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerSpecificGame(bigBoxAutoPlaySettings);
-                    break;
-
-                case BigBoxAutoPlayType.Off:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerNone(bigBoxAutoPlaySettings);
-                    break;
-
-                default:
-                    bigBoxAutoPlayer = new BigBoxAutoPlayerNone(bigBoxAutoPlaySettings);
-                    break;
+                gamesQuery = playlist.GetAllGames(false);
             }
 
-            return bigBoxAutoPlayer;
+            if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlatform))
+            {
+                gamesQuery = gamesQuery.Where(g => g.Platform == bigBoxAutoPlaySettings.FromPlatform);
+            }
+
+            if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.SpecificGameId))
+            {
+                gamesQuery = gamesQuery.Where(g => g.Id == bigBoxAutoPlaySettings.SpecificGameId);
+            }
+
+            if (bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault())
+            {
+                gamesQuery = gamesQuery.Where(g => g.Favorite);
+            }
+
+            if (!bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault())
+            {
+                gamesQuery = gamesQuery.Where(g => !g.Broken);
+            }
+
+            if (!bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault())
+            {
+                gamesQuery = gamesQuery.Where(g => !g.Hide);
+            }
+
+            autoPlayGame = null;
+
+            if(gamesQuery.Count() > 1)
+            {
+                Random random = new Random(Guid.NewGuid().GetHashCode());
+
+                int gameCount = gamesQuery.Count();
+                int randomIndex = random.Next(0, gamesQuery.Count());
+                autoPlayGame = gamesQuery.ElementAt(randomIndex);
+            }
+            else if(gamesQuery.Count() == 1)
+            {
+                autoPlayGame = gamesQuery.FirstOrDefault();
+            }
+            
+            if(autoPlayGame != null)
+            {
+                // filter to find the game 
+                PluginHelper.BigBoxMainViewModel.ShowGame(autoPlayGame, FilterType.None);
+
+                // launch the game 
+                PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
+            }
         }
 
-        public abstract void AutoPlay();
+        private static IGame autoPlayGame = null;
+
+        private static void DoAutoPlay(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (autoPlayGame != null)
+            {
+                
+            }
+        }
+
+        private static void DoBackgroundDelay(object sender, DoWorkEventArgs e)
+        {
+            Thread.Sleep(2000);
+        }
     }
 }

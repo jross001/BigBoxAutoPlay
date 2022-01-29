@@ -1,0 +1,125 @@
+﻿<Window x:Class="BigBoxAutoPlay.Views.BigBoxAutoPlaySetupView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BigBoxAutoPlay.Views"
+        mc:Ignorable="d"
+        Title="Configure BigBox AutoPlay" 
+        Height="700" Width="1100" 
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        ResizeMode="CanResizeWithGrip"
+        MouseDoubleClick="Window_MouseDoubleClick" MouseDown="Window_MouseDown">
+    <Grid Background="#2A2B34">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="15"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle Grid.Row="1" Grid.Column="1" Fill="#4D4F61" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <Rectangle Grid.Row="1" Grid.Column="1" Fill="#3F404E" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="1"/>
+
+        <Grid Name="RomHackGrid" Grid.Row="1" Grid.Column="1"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Height="35" Background="#2A2B34" 
+                    HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,5,10">
+                <TextBlock Text="BigBox AutoPlay Settings" 
+                           HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" 
+                           Background="#2A2B34" Foreground="#D3D3D5" />
+            </Border>
+
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Enable" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <CheckBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding Enabled, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Only favorites" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <CheckBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding OnlyFavorites, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Hidden games" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding IncludeHidden, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+
+                <Label Grid.Row="3" Grid.Column="0" Content="Broken games" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding IncludeBroken, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+
+                <Label Grid.Row="4" Grid.Column="0" Content="Platform" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2" Background="#343542" Foreground="#D3D3D5"
+                          ItemsSource="{Binding PlatformLookup}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedPlatform, Mode=TwoWay}"/>
+                <Button Grid.Row="4" Grid.Column="4" Content="Clear" Command="{Binding ClearPlatformCommand}" 
+                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0" />
+
+                <Label Grid.Row="5" Grid.Column="0" Content="Playlist" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2" Background="#343542" Foreground="#D3D3D5"
+                          ItemsSource="{Binding PlaylistLookup}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}"/>
+                <Button Grid.Row="5" Grid.Column="4" Content="Clear" Command="{Binding ClearPlaylistCommand}" 
+                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0"/>
+
+                <Label Grid.Row="6" Grid.Column="0" Content="Game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
+                <ComboBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2" Background="#343542" Foreground="#D3D3D5"
+                          ItemsSource="{Binding GameLookup}"
+                          DisplayMemberPath="Title"
+                          SelectedItem="{Binding SelectedGame, Mode=TwoWay}"/>
+                <Button Grid.Row="6" Grid.Column="4" Content="Clear" Command="{Binding ClearGameCommand}" 
+                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0" />
+
+                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5"                             
+                            HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Label Content="Delay" Foreground="#D3D3D5" VerticalAlignment="Bottom"/>
+                    <Label Content="{Binding DelayInSeconds}" ContentStringFormat="N1" Margin="2,0" 
+                           Foreground="#D3D3D5" VerticalAlignment="Bottom"/>
+                    <Label Content="s" Foreground="#D3D3D5" VerticalAlignment="Bottom"/>
+                </StackPanel>
+                <Slider Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,5" Name="StartupLoadDelaySlider"                        
+                        Value="{Binding DelayInSeconds, Mode=TwoWay}"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Minimum="0" Maximum="30" TickPlacement="BottomRight" TickFrequency="1" SmallChange="0.1" LargeChange="1.0"
+                        IsSnapToTickEnabled="False"/>
+
+            </Grid>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Button Content="OK" Width="80" Height="30" Command="{Binding OKCommand}"
+                    Background="#3F404E" Foreground="#D3D3D5" Margin="0,0,10,0" />
+            <Button Content="Cancel" Click="Button_Click" Width="80" Height="30" Background="#3F404E" Foreground="#D3D3D5" Margin="0,0,10,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

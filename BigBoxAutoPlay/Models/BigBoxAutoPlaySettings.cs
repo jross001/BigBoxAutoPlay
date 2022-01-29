@@ -2,11 +2,13 @@
 {
     public class BigBoxAutoPlaySettings
     {
-        public string AutoPlayType { get; set; }
-        public bool OnlyFavorites { get; set; }
-        public string Playlist { get; set; }
-        public string Platform { get; set; }
-        public string GameTitle { get; set; }
-        public int DelayInSeconds { get; set; }
+        public bool? Enabled { get; set; }        
+        public bool? OnlyFavorites { get; set; }
+        public bool? IncludeHidden { get; set; }
+        public bool? IncludeBroken { get; set; }        
+        public string FromPlaylist { get; set; }
+        public string FromPlatform { get; set; }
+        public string SpecificGameId { get; set; }
+        public int? DelayInSeconds { get; set; }
     }
 }

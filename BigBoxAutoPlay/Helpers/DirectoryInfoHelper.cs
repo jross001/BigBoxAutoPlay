@@ -6,6 +6,14 @@ namespace BigBoxAutoPlay.Helpers
     {
         private static readonly DirectoryInfoHelper instance = new DirectoryInfoHelper();
 
+        public static string ResourceFolder
+        {
+            get
+            {
+                return "pack://application:,,,/BigBoxAutoPlay;component/Resources";
+            }
+        }
+
         // path to the big box application directory
         private string applicationPath;
         public string ApplicationPath

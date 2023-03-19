@@ -11,6 +11,9 @@ A new menu item is added to LaunchBox under Tools > Configure BigBox AutoPlay.
 ### Enable
 Check the box to automatically play a game when BigBox starts.  Uncheck the box to disable the auto-play plugin.
 
+### Select game
+Check the box to specify whether the game should be automatically selected before launching.  By selecting the game before launching, if a marquee screen is in use, it will automatically update the marquee screen as this happens on selecting the game.
+
 ### Only favorites
 Check the box to filter the randomly selected game to only include favorites
 

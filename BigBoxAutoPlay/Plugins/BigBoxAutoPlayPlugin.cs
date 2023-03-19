@@ -24,7 +24,7 @@ namespace BigBoxAutoPlay
                         BackgroundWorker backgroundWorker = new BackgroundWorker();
                         backgroundWorker.DoWork += DoBackgroundDelay;
                         backgroundWorker.RunWorkerCompleted += DoAutoPlay;
-                        backgroundWorker.RunWorkerAsync();                        
+                        backgroundWorker.RunWorkerAsync();
                         break;
 
                     default:

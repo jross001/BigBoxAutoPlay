@@ -1,0 +1,6 @@
+﻿Source code
++++++++++++
+
+Overview
+========
+The source code for Big Box Auto Play is available in the `Big Box Auto Play github repo <https://github.com/AtomFry/BigBoxAutoPlay>`_

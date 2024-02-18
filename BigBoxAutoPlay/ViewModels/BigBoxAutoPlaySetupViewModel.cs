@@ -149,6 +149,10 @@ namespace BigBoxAutoPlay.ViewModels
             IncludeHidden = bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault();
             IncludeBroken = bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault();                                    
             DelayInSeconds = bigBoxAutoPlaySettings.DelayInSeconds.GetValueOrDefault();
+            CreateServer = bigBoxAutoPlaySettings.CreateServer.GetValueOrDefault();
+            DoNotLaunch = bigBoxAutoPlaySettings.DoNotLaunch.GetValueOrDefault();
+            ServerPort = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
+            ServerIPAddress = bigBoxAutoPlaySettings.ServerIPAddress;
 
             if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlatform))
             {
@@ -281,6 +285,46 @@ namespace BigBoxAutoPlay.ViewModels
             {
                 bigBoxAutoPlaySettings.DelayInSeconds = value;
                 OnPropertyChanged("DelayInSeconds");
+            }
+        }
+
+        public bool CreateServer
+        {
+            get => bigBoxAutoPlaySettings?.CreateServer == true;
+            set
+            {
+                bigBoxAutoPlaySettings.CreateServer = value;
+                OnPropertyChanged("CreateServer");
+            }
+        }
+
+        public bool DoNotLaunch
+        {
+            get => bigBoxAutoPlaySettings?.DoNotLaunch == true;
+            set
+            {
+                bigBoxAutoPlaySettings.DoNotLaunch = value;
+                OnPropertyChanged("DoNotLaunch");
+            }
+        }
+
+        public int ServerPort
+        {
+            get => bigBoxAutoPlaySettings?.ServerPort ?? 0;
+            set
+            {
+                bigBoxAutoPlaySettings.ServerPort = value;
+                OnPropertyChanged("ServerPort");
+            }
+        }
+
+        public string ServerIPAddress
+        {
+            get => bigBoxAutoPlaySettings?.ServerIPAddress;
+            set
+            {
+                bigBoxAutoPlaySettings.ServerIPAddress = value;
+                OnPropertyChanged("ServerIPAddress");
             }
         }
     }

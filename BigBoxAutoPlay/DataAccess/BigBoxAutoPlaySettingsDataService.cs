@@ -39,7 +39,11 @@ namespace BigBoxAutoPlay.DataAccess
                     FromPlaylist = string.Empty,
                     FromPlatform = string.Empty,
                     SpecificGameId = string.Empty,
-                    DelayInSeconds = 2
+                    DelayInSeconds = 2,
+                    CreateServer = false,
+                    ServerIPAddress = "127.0.0.1",
+                    ServerPort = 50001,
+                    DoNotLaunch = false
                 };
 
                 // save the file 
@@ -70,7 +74,11 @@ namespace BigBoxAutoPlay.DataAccess
                     FromPlaylist = string.Empty,
                     FromPlatform = string.Empty,
                     SpecificGameId = string.Empty,
-                    DelayInSeconds = 2
+                    DelayInSeconds = 2,
+                    CreateServer = false,
+                    ServerIPAddress = "127.0.0.1",
+                    ServerPort = 50001,
+                    DoNotLaunch = false
                 };
 
                 // save the file 

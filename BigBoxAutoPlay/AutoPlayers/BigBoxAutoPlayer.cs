@@ -19,6 +19,7 @@ namespace BigBoxAutoPlay.AutoPlayers
             // shouldn't be called but check just in case 
             if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
 
+
             IEnumerable<IGame> gamesQuery = PluginHelper.DataManager.GetAllGames();
 
             if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.SpecificGameId))
@@ -76,13 +77,18 @@ namespace BigBoxAutoPlay.AutoPlayers
                     // filter to find the game 
                     PluginHelper.BigBoxMainViewModel.ShowGame(autoPlayGame, FilterType.None);
 
-                    BackgroundWorker backgroundWorker = new BackgroundWorker();
-                    backgroundWorker.DoWork += DoBackgroundDelay;
-                    backgroundWorker.RunWorkerCompleted += DoAutoPlay;
-                    backgroundWorker.RunWorkerAsync();
+                    if (bigBoxAutoPlaySettings.DoNotLaunch == true) return;
+
+                    if (autoPlayGame != null)
+                    {
+                        // launch the game 
+                        PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
+                    }
                 }
                 else
                 {
+                    if (bigBoxAutoPlaySettings.DoNotLaunch == true) return;
+
                     // launch the game 
                     PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
                 }
@@ -90,19 +96,5 @@ namespace BigBoxAutoPlay.AutoPlayers
         }
 
         private static IGame autoPlayGame = null;
-
-        private static void DoAutoPlay(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (autoPlayGame != null)
-            {
-                // launch the game 
-                PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
-            }
-        }
-
-        private static void DoBackgroundDelay(object sender, DoWorkEventArgs e)
-        {
-            Thread.Sleep(8000);
-        }
     }
 }

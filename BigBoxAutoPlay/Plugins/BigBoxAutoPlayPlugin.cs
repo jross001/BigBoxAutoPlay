@@ -18,7 +18,8 @@ namespace BigBoxAutoPlay
     public class BigBoxAutoPlayPlugin : ISystemEventsPlugin
     {        
         private static Thread listenerThread;
-        private static TcpListener tcpListener;        
+        private static TcpListener tcpListener;
+        private static Dispatcher dispatcher;
 
         public void OnEventRaised(string eventType)
         {
@@ -26,6 +27,10 @@ namespace BigBoxAutoPlay
             {
                 switch (eventType)
                 {
+                    case SystemEventTypes.PluginInitialized:
+                        dispatcher = Dispatcher.CurrentDispatcher;
+                        break;
+
                     case SystemEventTypes.BigBoxStartupCompleted:
                         CreateServer();
                         DelayThenAutoPlay();
@@ -102,7 +107,8 @@ namespace BigBoxAutoPlay
                     IPAddress ipAddress = IPAddress.Parse(bigBoxAutoPlaySettings.ServerIPAddress);
                     int port = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
 
-                    listenerThread = new Thread(() => StartListener(ipAddress, port, Dispatcher.CurrentDispatcher));
+                    // listenerThread = new Thread(() => StartListener(ipAddress, port, dispatcher));
+                    listenerThread = new Thread(() => StartListener(ipAddress, port));
                     listenerThread.Start();
                 }
             }
@@ -124,7 +130,8 @@ namespace BigBoxAutoPlay
             }
         }
 
-        static void StartListener(IPAddress ipAddress, int port, Dispatcher dispatcher)
+        // static void StartListener(IPAddress ipAddress, int port, Dispatcher dispatcher)
+        static void StartListener(IPAddress ipAddress, int port)
         {
             try
             {
@@ -158,7 +165,11 @@ namespace BigBoxAutoPlay
                     if (bigBoxAutoPlaySettings != null)
                     {
                         SendResponse(stream, $"Received message: {receivedData}");
-                        BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings);
+
+                        dispatcher.Invoke(() =>
+                        {
+                            BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings);
+                        });
                     }
 
                     // Close the connection

@@ -33,6 +33,7 @@ namespace BigBoxAutoPlay.DataAccess
                 {
                     Enabled = false,
                     SelectGame = false,
+                    LaunchGame = false,
                     OnlyFavorites = false,
                     IncludeHidden = false,
                     IncludeBroken = false,
@@ -42,8 +43,7 @@ namespace BigBoxAutoPlay.DataAccess
                     DelayInSeconds = 2,
                     CreateServer = false,
                     ServerIPAddress = "127.0.0.1",
-                    ServerPort = 50001,
-                    DoNotLaunch = false
+                    ServerPort = 50001                    
                 };
 
                 // save the file 
@@ -68,17 +68,20 @@ namespace BigBoxAutoPlay.DataAccess
                 BigBoxAutoPlaySettings bigBoxAutoPlaySettings = new BigBoxAutoPlaySettings()
                 {
                     Enabled = false,
+                    SelectGame = false,
+                    LaunchGame = false,
+                    DelayInSeconds = 2,
+
                     OnlyFavorites = false,
                     IncludeHidden = false,
                     IncludeBroken = false,
                     FromPlaylist = string.Empty,
                     FromPlatform = string.Empty,
                     SpecificGameId = string.Empty,
-                    DelayInSeconds = 2,
+                    
                     CreateServer = false,
                     ServerIPAddress = "127.0.0.1",
-                    ServerPort = 50001,
-                    DoNotLaunch = false
+                    ServerPort = 50001                    
                 };
 
                 // save the file 

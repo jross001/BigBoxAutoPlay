@@ -2,9 +2,7 @@
 using BigBoxAutoPlay.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 
@@ -12,13 +10,41 @@ namespace BigBoxAutoPlay.AutoPlayers
 {
     public class BigBoxAutoPlayer
     {
-        public static void AutoPlay(BigBoxAutoPlaySettings bigBoxAutoPlaySettings)
+        private readonly BigBoxAutoPlaySettings bigBoxAutoPlaySettings;
+        private IGame resolvedGame;
+
+        public static void AutoPlayOnStartup()
         {
-            autoPlayGame = null;
+            BigBoxAutoPlaySettings settings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+            BigBoxAutoPlayer bigBoxAutoPlayer = new BigBoxAutoPlayer(settings);
+            bigBoxAutoPlayer.ResolveGame();
+            bigBoxAutoPlayer.SelectGame();
+            bigBoxAutoPlayer.LaunchGame();            
+        }
 
-            // shouldn't be called but check just in case 
+        public static BigBoxAutoPlayer AutoPlayFromMessage(BigBoxAutoPlaySettings _bigBoxAutoPlaySettings)
+        {
+            BigBoxAutoPlayer bigBoxAutoPlayer = new BigBoxAutoPlayer(_bigBoxAutoPlaySettings);            
+            bigBoxAutoPlayer.ResolveGame();
+            bigBoxAutoPlayer.SelectGame();
+            bigBoxAutoPlayer.LaunchGame();
+            return bigBoxAutoPlayer;
+        }
+        
+        public BigBoxAutoPlayer(BigBoxAutoPlaySettings _bigBoxAutoPlaySettings) 
+        {
+            bigBoxAutoPlaySettings = _bigBoxAutoPlaySettings;            
+        }
+
+        public void ResolveGame()
+        {
+            resolvedGame = null;
+
+            // bail out if we ain't got no settings
+            if (bigBoxAutoPlaySettings == null) return;
+
+            // bail out if settings are disabled 
             if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
-
 
             IEnumerable<IGame> gamesQuery = PluginHelper.DataManager.GetAllGames();
 
@@ -57,44 +83,53 @@ namespace BigBoxAutoPlay.AutoPlayers
                 }
             }
 
-            if(gamesQuery.Count() > 1)
+            if (gamesQuery.Count() > 1)
             {
                 Random random = new Random(Guid.NewGuid().GetHashCode());
 
                 int gameCount = gamesQuery.Count();
                 int randomIndex = random.Next(0, gamesQuery.Count());
-                autoPlayGame = gamesQuery.ElementAt(randomIndex);
+                resolvedGame = gamesQuery.ElementAt(randomIndex);
             }
-            else if(gamesQuery.Count() == 1)
+            else if (gamesQuery.Count() == 1)
             {
-                autoPlayGame = gamesQuery.FirstOrDefault();
-            }
-            
-            if(autoPlayGame != null)
-            {
-                if(bigBoxAutoPlaySettings.SelectGame.GetValueOrDefault())
-                {
-                    // filter to find the game 
-                    PluginHelper.BigBoxMainViewModel.ShowGame(autoPlayGame, FilterType.None);
-
-                    if (bigBoxAutoPlaySettings.DoNotLaunch == true) return;
-
-                    if (autoPlayGame != null)
-                    {
-                        // launch the game 
-                        PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
-                    }
-                }
-                else
-                {
-                    if (bigBoxAutoPlaySettings.DoNotLaunch == true) return;
-
-                    // launch the game 
-                    PluginHelper.BigBoxMainViewModel.PlayGame(autoPlayGame, null, null, null);
-                }
+                resolvedGame = gamesQuery.FirstOrDefault();
             }
         }
 
-        private static IGame autoPlayGame = null;
+        public void SelectGame()
+        {
+            // bail out if we ain't got no settings
+            if (bigBoxAutoPlaySettings == null) return;
+
+            // bail out if settings are disabled 
+            if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
+
+            // bail out if select game is not checked
+            if (!bigBoxAutoPlaySettings.SelectGame.GetValueOrDefault()) return;
+
+            // bail out if the game is not resolved 
+            if (resolvedGame == null) return;
+
+            // select the game
+            PluginHelper.BigBoxMainViewModel.ShowGame(resolvedGame, FilterType.None);
+        }
+
+        public void LaunchGame()
+        {
+            // bail out if we ain't got no settings
+            if (bigBoxAutoPlaySettings == null) return;
+
+            // bail out if settings are disabled 
+            if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
+
+            // bail out if launch game is not checked
+            if (!bigBoxAutoPlaySettings.LaunchGame.GetValueOrDefault()) return;
+
+            // bail out if the game is not resolved 
+            if (resolvedGame == null) return;
+
+            PluginHelper.BigBoxMainViewModel.PlayGame(resolvedGame, null, null, null);
+        }
     }
 }

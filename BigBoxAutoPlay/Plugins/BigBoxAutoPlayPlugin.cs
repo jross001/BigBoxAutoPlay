@@ -9,16 +9,16 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 
 namespace BigBoxAutoPlay
 {
     public class BigBoxAutoPlayPlugin : ISystemEventsPlugin
-    {
-        BigBoxAutoPlaySettings bigBoxAutoPlaySettings;
+    {        
         private static Thread listenerThread;
-        private static TcpListener tcpListener;
+        private static TcpListener tcpListener;        
 
         public void OnEventRaised(string eventType)
         {
@@ -59,18 +59,18 @@ namespace BigBoxAutoPlay
 
         private void DelayThenAutoPlay()
         {
-            bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+            BigBoxAutoPlaySettings bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
 
             if (bigBoxAutoPlaySettings?.DelayInSeconds.GetValueOrDefault() > 0)
             {
                 BackgroundWorker backgroundWorker = new BackgroundWorker();
                 backgroundWorker.DoWork += DoBackgroundDelay;
-                backgroundWorker.RunWorkerCompleted += DoAutoPlay;
+                backgroundWorker.RunWorkerCompleted += DoAutoPlayOnStartup;
                 backgroundWorker.RunWorkerAsync();
             }
             else
             {
-                BigBoxAutoPlayer.AutoPlay(bigBoxAutoPlaySettings);
+                BigBoxAutoPlayer.AutoPlayOnStartup();
             }
         }
 
@@ -78,7 +78,7 @@ namespace BigBoxAutoPlay
         {
             try
             {
-                bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+                BigBoxAutoPlaySettings bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();                
 
                 if (bigBoxAutoPlaySettings?.DelayInSeconds.GetValueOrDefault() > 0)
                 {
@@ -95,14 +95,14 @@ namespace BigBoxAutoPlay
         {
             try
             {
-                bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+                BigBoxAutoPlaySettings bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
 
                 if (bigBoxAutoPlaySettings?.CreateServer == true)
                 {
                     IPAddress ipAddress = IPAddress.Parse(bigBoxAutoPlaySettings.ServerIPAddress);
                     int port = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
 
-                    listenerThread = new Thread(() => StartListener(ipAddress, port));
+                    listenerThread = new Thread(() => StartListener(ipAddress, port, Dispatcher.CurrentDispatcher));
                     listenerThread.Start();
                 }
             }
@@ -112,14 +112,11 @@ namespace BigBoxAutoPlay
             }
         }
 
-        private void DoAutoPlay(object sender, RunWorkerCompletedEventArgs e)
+        private void DoAutoPlayOnStartup(object sender, RunWorkerCompletedEventArgs e)
         {
             try
             {
-                if (bigBoxAutoPlaySettings?.Enabled == true)
-                {
-                    BigBoxAutoPlayer.AutoPlay(bigBoxAutoPlaySettings);
-                }
+                BigBoxAutoPlayer.AutoPlayOnStartup();
             }
             catch (Exception ex)
             {
@@ -127,7 +124,7 @@ namespace BigBoxAutoPlay
             }
         }
 
-        static void StartListener(IPAddress ipAddress, int port)
+        static void StartListener(IPAddress ipAddress, int port, Dispatcher dispatcher)
         {
             try
             {
@@ -146,9 +143,8 @@ namespace BigBoxAutoPlay
                     byte[] buffer = new byte[1024];
                     int bytesRead = stream.Read(buffer, 0, buffer.Length);
                     string receivedData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
- 
-                    BigBoxAutoPlaySettings bigBoxAutoPlaySettings = null;
 
+                    BigBoxAutoPlaySettings bigBoxAutoPlaySettings = null;
                     try
                     {
                         bigBoxAutoPlaySettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
@@ -161,8 +157,8 @@ namespace BigBoxAutoPlay
 
                     if (bigBoxAutoPlaySettings != null)
                     {
-                        SendResponse(stream, "Got it");
-                        BigBoxAutoPlayer.AutoPlay(bigBoxAutoPlaySettings);
+                        SendResponse(stream, $"Received message: {receivedData}");
+                        BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings);
                     }
 
                     // Close the connection

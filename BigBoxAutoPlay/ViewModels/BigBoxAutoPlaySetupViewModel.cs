@@ -145,12 +145,14 @@ namespace BigBoxAutoPlay.ViewModels
         {
             Enabled = bigBoxAutoPlaySettings.Enabled.GetValueOrDefault();
             SelectGame = bigBoxAutoPlaySettings.SelectGame.GetValueOrDefault();
+            LaunchGame = bigBoxAutoPlaySettings.LaunchGame.GetValueOrDefault();
+
             OnlyFavorites = bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault();
             IncludeHidden = bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault();
             IncludeBroken = bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault();                                    
             DelayInSeconds = bigBoxAutoPlaySettings.DelayInSeconds.GetValueOrDefault();
             CreateServer = bigBoxAutoPlaySettings.CreateServer.GetValueOrDefault();
-            DoNotLaunch = bigBoxAutoPlaySettings.DoNotLaunch.GetValueOrDefault();
+            
             ServerPort = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
             ServerIPAddress = bigBoxAutoPlaySettings.ServerIPAddress;
 
@@ -298,13 +300,13 @@ namespace BigBoxAutoPlay.ViewModels
             }
         }
 
-        public bool DoNotLaunch
+        public bool LaunchGame
         {
-            get => bigBoxAutoPlaySettings?.DoNotLaunch == true;
+            get => bigBoxAutoPlaySettings?.LaunchGame == true;
             set
             {
-                bigBoxAutoPlaySettings.DoNotLaunch = value;
-                OnPropertyChanged("DoNotLaunch");
+                bigBoxAutoPlaySettings.LaunchGame = value;
+                OnPropertyChanged("LaunchGame");
             }
         }
 

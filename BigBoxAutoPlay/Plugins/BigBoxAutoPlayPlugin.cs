@@ -15,11 +15,12 @@ using Unbroken.LaunchBox.Plugins.Data;
 
 namespace BigBoxAutoPlay
 {
-    public class BigBoxAutoPlayPlugin : ISystemEventsPlugin
+    public class BigBoxAutoPlayPlugin : ISystemEventsPlugin, IGameLaunchingPlugin
     {        
         private static Thread listenerThread;
         private static TcpListener tcpListener;
         private static Dispatcher dispatcher;
+        private static bool playingGame;
 
         public void OnEventRaised(string eventType)
         {
@@ -195,32 +196,51 @@ namespace BigBoxAutoPlay
 
                 if (receivedData == string.Empty) return;
 
-                try
-                {
-                    bigBoxAutoPlaySettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
-                    SendResponse(stream, $"Received message. {receivedData}");
-                }
-                catch (Exception ex)
-                {
-                    bigBoxAutoPlaySettings = null;
-                    SendResponse(stream, $"Error deserializing message: {ex.Message}");
-                    LogHelper.LogException(ex, $"StartListener - deserializing message\n{receivedData}");
-                }
+                StringBuilder responseStringBuilder = new StringBuilder();
+                responseStringBuilder.AppendLine($"Recieved message: {receivedData}");
 
-                if (bigBoxAutoPlaySettings == null) return;
-
-                try
+                if (playingGame)
                 {
-                    // autoplay from the provided settings - invoke via dispatcher so it runs under the BigBox UI thread
-                    dispatcher.Invoke(() =>
+                    responseStringBuilder.AppendLine("Cannot run while a game is playing");
+                }    
+
+                if (!playingGame)
+                {
+                    try
                     {
-                        BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings);
-                    });                    
+                        bigBoxAutoPlaySettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
+                    }
+                    catch (Exception ex)
+                    {
+                        bigBoxAutoPlaySettings = null;
+                        responseStringBuilder.AppendLine($"Error deserializing message: {ex.Message}");
+                        LogHelper.LogException(ex, $"StartListener - deserializing message\n{receivedData}");
+                    }
+
+                    if (bigBoxAutoPlaySettings == null) return;
+
+                    try
+                    {
+                        // autoplay from the provided settings - invoke via dispatcher so it runs under the BigBox UI thread
+                        dispatcher.Invoke(() =>
+                        {
+                            responseStringBuilder.AppendLine(BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings));
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        responseStringBuilder.AppendLine($"Error playing from message: {ex.Message}");
+                        LogHelper.LogException(ex, "StartListener - Autoplay");
+                    }
+                }
+
+                try
+                {
+                    SendResponse(stream, responseStringBuilder.ToString());
                 }
                 catch(Exception ex)
                 {
-                    SendResponse(stream, $"Error playing from message: {ex.Message}");
-                    LogHelper.LogException(ex, "StartListener - Autoplay");
+                    LogHelper.LogException(ex, "StartListener - Send response");
                 }
 
                 try
@@ -231,10 +251,8 @@ namespace BigBoxAutoPlay
                 catch(Exception ex)
                 {
                     LogHelper.LogException(ex, "StartListener - close client");
-                }
-                
+                } 
             }
-
         }
 
         static void SendResponse(NetworkStream stream, string response)
@@ -248,6 +266,21 @@ namespace BigBoxAutoPlay
             {
                 LogHelper.LogException(ex, "SendResponse");
             }
+        }
+
+        public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
+        {
+            // do nothing
+        }
+
+        public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
+        {
+            playingGame = true;
+        }
+
+        public void OnGameExited()
+        {
+            playingGame = false;
         }
     }
 }

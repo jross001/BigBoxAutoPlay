@@ -5,6 +5,7 @@
         // enabling functionality
         public bool? Enabled { get; set; }
         public bool? SelectGame { get; set; }
+        public bool? ShowPlatformsBeforeSelectingGame { get; set; }
         public bool? LaunchGame { get; set; }
         public int? DelayInSeconds { get; set; }
 
@@ -19,6 +20,10 @@
         // server config
         public bool? CreateServer { get; set; }
         public string ServerIPAddress { get; set; }
-        public int? ServerPort { get; set; }        
+        public int? ServerPort { get; set; } 
+
+        // additional parameters for launching game from TCP server
+        public string FromPlaylistName { get; set; }
+        public string GameTitle { get; set; }
     }
 }

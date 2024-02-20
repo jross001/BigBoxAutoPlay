@@ -33,6 +33,7 @@ namespace BigBoxAutoPlay.DataAccess
                 {
                     Enabled = false,
                     SelectGame = false,
+                    ShowPlatformsBeforeSelectingGame = false,
                     LaunchGame = false,
                     OnlyFavorites = false,
                     IncludeHidden = false,
@@ -69,6 +70,7 @@ namespace BigBoxAutoPlay.DataAccess
                 {
                     Enabled = false,
                     SelectGame = false,
+                    ShowPlatformsBeforeSelectingGame = false,
                     LaunchGame = false,
                     DelayInSeconds = 2,
 

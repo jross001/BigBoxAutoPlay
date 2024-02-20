@@ -145,6 +145,7 @@ namespace BigBoxAutoPlay.ViewModels
         {
             Enabled = bigBoxAutoPlaySettings.Enabled.GetValueOrDefault();
             SelectGame = bigBoxAutoPlaySettings.SelectGame.GetValueOrDefault();
+            ShowPlatformsBeforeSelectingGame = bigBoxAutoPlaySettings.ShowPlatformsBeforeSelectingGame.GetValueOrDefault();
             LaunchGame = bigBoxAutoPlaySettings.LaunchGame.GetValueOrDefault();
 
             OnlyFavorites = bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault();
@@ -249,6 +250,17 @@ namespace BigBoxAutoPlay.ViewModels
                 OnPropertyChanged("SelectGame");
             }
         }
+
+        public bool ShowPlatformsBeforeSelectingGame
+        {
+            get => bigBoxAutoPlaySettings?.ShowPlatformsBeforeSelectingGame == true;
+            set
+            {
+                bigBoxAutoPlaySettings.ShowPlatformsBeforeSelectingGame = value;
+                OnPropertyChanged("ShowPlatformsBeforeSelectingGame");
+            }
+        }
+
 
         public bool OnlyFavorites
         {

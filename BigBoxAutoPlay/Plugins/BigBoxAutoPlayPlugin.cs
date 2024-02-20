@@ -133,65 +133,115 @@ namespace BigBoxAutoPlay
         // static void StartListener(IPAddress ipAddress, int port, Dispatcher dispatcher)
         static void StartListener(IPAddress ipAddress, int port)
         {
+            TcpClient client = null;
+            NetworkStream stream = null;
+            string receivedData = string.Empty;
+            BigBoxAutoPlaySettings bigBoxAutoPlaySettings = null;
+
             try
             {
                 tcpListener = new TcpListener(ipAddress, port);
                 tcpListener.Start();
-
-                while (true)
-                {
-                    // Accept the pending client connection
-                    TcpClient client = tcpListener.AcceptTcpClient();
-                    
-                    // Get the network stream for sending and receiving data
-                    NetworkStream stream = client.GetStream();
-
-                    // Read data from the client
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    string receivedData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-
-                    BigBoxAutoPlaySettings bigBoxAutoPlaySettings = null;
-                    try
-                    {
-                        bigBoxAutoPlaySettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
-                    }
-                    catch (Exception ex)
-                    {
-                        SendResponse(stream, $"Error attempting to convert message to bigBoxAutoPlaySettings. {ex.Message}");
-                        LogHelper.LogException(ex, $"Attempting to convert message to bigBoxAutoPlaySettings\n{receivedData}");
-                    }
-
-                    if (bigBoxAutoPlaySettings != null)
-                    {
-                        SendResponse(stream, $"Received message: {receivedData}");
-
-                        dispatcher.Invoke(() =>
-                        {
-                            BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings);
-                        });
-                    }
-
-                    // Close the connection
-                    client.Close();
-                }
             }
             catch (Exception ex)
             {
+                tcpListener?.Stop();
+                tcpListener = null;
                 LogHelper.LogException(ex, "StartListener");
             }
-            finally
-            {
-                tcpListener.Stop();
+
+            if (tcpListener == null) return;
+
+            while (true)
+            {                
+                try
+                {
+                    // Accept the pending client connection
+                    client = tcpListener.AcceptTcpClient();
+                }
+                catch(Exception ex)
+                {
+                    client = null;
+                    LogHelper.LogException(ex, "StartListener - Accept client");
+                }
+
+                if (client == null) return;
+
+                try
+                {
+                    // Get the network stream for sending and receiving data
+                    stream = client.GetStream();
+                }
+                catch(Exception ex)
+                {
+                    stream = null;
+                    LogHelper.LogException(ex, "StartListener - Get stream");
+                }
+
+                if (stream == null) return;
+                                
+                try
+                {
+                    // Read data from the client
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    receivedData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                }
+                catch(Exception ex)
+                {
+                    receivedData = string.Empty;
+                    LogHelper.LogException(ex, "StartListener - Receive data");
+                }
+
+                if (receivedData == string.Empty) return;
+
+                try
+                {
+                    bigBoxAutoPlaySettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
+                    SendResponse(stream, $"Received message. {receivedData}");
+                }
+                catch (Exception ex)
+                {
+                    bigBoxAutoPlaySettings = null;
+                    SendResponse(stream, $"Error deserializing message: {ex.Message}");
+                    LogHelper.LogException(ex, $"StartListener - deserializing message\n{receivedData}");
+                }
+
+                if (bigBoxAutoPlaySettings == null) return;
+
+                try
+                {
+                    // autoplay from the provided settings - invoke via dispatcher so it runs under the BigBox UI thread
+                    dispatcher.Invoke(() =>
+                    {
+                        BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings);
+                    });                    
+                }
+                catch(Exception ex)
+                {
+                    SendResponse(stream, $"Error playing from message: {ex.Message}");
+                    LogHelper.LogException(ex, "StartListener - Autoplay");
+                }
+
+                try
+                {
+                    // Close the connection
+                    client?.Close();
+                }
+                catch(Exception ex)
+                {
+                    LogHelper.LogException(ex, "StartListener - close client");
+                }
+                
             }
+
         }
 
         static void SendResponse(NetworkStream stream, string response)
         {
             try
-            {
-                string responseData = "Hello from the server!";
-                byte[] responseBuffer = Encoding.ASCII.GetBytes(responseData);
+            {                
+                byte[] responseBuffer = Encoding.ASCII.GetBytes(response);
                 stream.Write(responseBuffer, 0, responseBuffer.Length);
             }
             catch (Exception ex)

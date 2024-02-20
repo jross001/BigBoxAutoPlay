@@ -50,50 +50,52 @@ namespace BigBoxAutoPlay.AutoPlayers
 
             if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.SpecificGameId))
             {
-                gamesQuery = gamesQuery.Where(g => g.Id == bigBoxAutoPlaySettings.SpecificGameId);
+                gamesQuery = gamesQuery?.Where(g => g.Id == bigBoxAutoPlaySettings.SpecificGameId);
             }
             else
             {
                 if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlaylist))
                 {
                     IEnumerable<IPlaylist> allPlaylistsQuery = PluginHelper.DataManager.GetAllPlaylists();
-                    IPlaylist playlist = allPlaylistsQuery.FirstOrDefault(p => p.PlaylistId == bigBoxAutoPlaySettings.FromPlaylist);
+                    
+                    IPlaylist playlist = allPlaylistsQuery?.FirstOrDefault(p => p.PlaylistId == bigBoxAutoPlaySettings.FromPlaylist);
 
-                    gamesQuery = playlist.GetAllGames(false);
+                    gamesQuery = playlist?.GetAllGames(false);
                 }
 
                 if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlatform))
                 {
-                    gamesQuery = gamesQuery.Where(g => g.Platform == bigBoxAutoPlaySettings.FromPlatform);
+                    gamesQuery = gamesQuery?.Where(g => g.Platform == bigBoxAutoPlaySettings.FromPlatform);
                 }
 
                 if (bigBoxAutoPlaySettings.OnlyFavorites.GetValueOrDefault())
                 {
-                    gamesQuery = gamesQuery.Where(g => g.Favorite);
+                    gamesQuery = gamesQuery?.Where(g => g.Favorite);
                 }
 
                 if (!bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault())
                 {
-                    gamesQuery = gamesQuery.Where(g => !g.Broken);
+                    gamesQuery = gamesQuery?.Where(g => !g.Broken);
                 }
 
                 if (!bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault())
                 {
-                    gamesQuery = gamesQuery.Where(g => !g.Hide);
+                    gamesQuery = gamesQuery?.Where(g => !g.Hide);
                 }
             }
 
-            if (gamesQuery.Count() > 1)
+            int? gameCount = gamesQuery?.Count();
+
+            if (gameCount > 1)
             {
                 Random random = new Random(Guid.NewGuid().GetHashCode());
-
-                int gameCount = gamesQuery.Count();
-                int randomIndex = random.Next(0, gamesQuery.Count());
-                resolvedGame = gamesQuery.ElementAt(randomIndex);
+                
+                int randomIndex = random.Next(0, gameCount.GetValueOrDefault());
+                resolvedGame = gamesQuery?.ElementAt(randomIndex);
             }
-            else if (gamesQuery.Count() == 1)
+            else if (gameCount == 1)
             {
-                resolvedGame = gamesQuery.FirstOrDefault();
+                resolvedGame = gamesQuery?.FirstOrDefault();
             }
         }
 
@@ -129,6 +131,7 @@ namespace BigBoxAutoPlay.AutoPlayers
             // bail out if the game is not resolved 
             if (resolvedGame == null) return;
 
+            // launch the game
             PluginHelper.BigBoxMainViewModel.PlayGame(resolvedGame, null, null, null);
         }
     }

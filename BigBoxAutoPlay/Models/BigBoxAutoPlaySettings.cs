@@ -1,5 +1,8 @@
 ﻿namespace BigBoxAutoPlay.Models
 {
+    // Need until BigBox API provides an interface
+    public enum GameStateEnum { IDLE, GAME_LAUNCHED, GAME_EXITED }
+
     public class BigBoxAutoPlaySettings
     {
         // enabling functionality
@@ -17,13 +20,22 @@
         public string FromPlatform { get; set; }
         public string SpecificGameId { get; set; }
         
-        // server config
-        public bool? CreateServer { get; set; }
-        public string ServerIPAddress { get; set; }
-        public int? ServerPort { get; set; } 
+        // UDP server config
+        public bool? ServerEnable { get; set; }
+        public int? ServerPort { get; set; }
 
-        // additional parameters for launching game from TCP server
+        // UDP Remote Client config
+        public bool? RemoteSync { get; set; }
+        public string RemoteIPAddress { get; set; }
+        public int? RemotePort { get; set; }
+
+        // UDP Multicast config
+        public bool? MulticastEnable { get; set; }
+        public string MulticastAddress { get; set; }
+
+        // additional parameters for launching game from UDP server
         public string FromPlaylistName { get; set; }
-        public string GameTitle { get; set; }
+        public string GameTitle { get; set; }       
+        public GameStateEnum? GameState { get; set; }
     }
 }

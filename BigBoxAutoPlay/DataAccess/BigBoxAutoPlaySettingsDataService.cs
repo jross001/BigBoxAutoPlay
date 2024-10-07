@@ -42,9 +42,13 @@ namespace BigBoxAutoPlay.DataAccess
                     FromPlatform = string.Empty,
                     SpecificGameId = string.Empty,
                     DelayInSeconds = 2,
-                    CreateServer = false,
-                    ServerIPAddress = "127.0.0.1",
-                    ServerPort = 50001                    
+                    ServerEnable = false,
+                    ServerPort = 50001,
+                    RemoteSync = false,
+                    RemoteIPAddress = "0.0.0.0",
+                    RemotePort = 50001,
+                    MulticastEnable = false,
+                    MulticastAddress = "224.1.1.1"            
                 };
 
                 // save the file 
@@ -80,10 +84,16 @@ namespace BigBoxAutoPlay.DataAccess
                     FromPlaylist = string.Empty,
                     FromPlatform = string.Empty,
                     SpecificGameId = string.Empty,
-                    
-                    CreateServer = false,
-                    ServerIPAddress = "127.0.0.1",
-                    ServerPort = 50001                    
+
+                    ServerEnable = false,
+                    ServerPort = 50001,
+
+                    RemoteSync = false,
+                    RemoteIPAddress = "0.0.0.0",
+                    RemotePort = 50001,
+
+                    MulticastEnable = false,
+                    MulticastAddress = "224.1.1.1"
                 };
 
                 // save the file 

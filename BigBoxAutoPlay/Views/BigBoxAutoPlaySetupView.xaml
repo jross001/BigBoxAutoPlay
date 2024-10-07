@@ -25,7 +25,7 @@
         </Grid.ColumnDefinitions>
 
         <Rectangle Grid.Row="1" Grid.Column="1" Fill="#4D4F61" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-        <Rectangle Grid.Row="1" Grid.Column="1" Fill="#3F404E" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="1"/>
+        <Rectangle Grid.Row="1" Grid.Column="1" Fill="#3F404E" Stretch="Fill" Margin="1,1,1,0" Grid.RowSpan="2"/>
 
         <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -42,12 +42,12 @@
 
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="109"/>
+                    <ColumnDefinition Width="426*"/>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="145*"/>
+                    <ColumnDefinition Width="145*"/>
+                    <ColumnDefinition Width="145*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -65,76 +65,92 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto" MinHeight="38.098"/>
+                    <RowDefinition Height="Auto" MinHeight="39"/>
+                    <RowDefinition Height="Auto" MinHeight="42"/>
+                    <RowDefinition Height="43*"/>
+                    <RowDefinition Height="50*"/>
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Enable" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding Enabled, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Column="0" Content="Enable" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="45"/>
+                <CheckBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding Enabled, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Select game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding SelectGame, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="Select game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="75"/>
+                <CheckBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding SelectGame, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="2" Grid.Column="0" Content="Show platform before selecting game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding ShowPlatformsBeforeSelectingGame, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="2" Content="Show platform before selecting game" Foreground="#D3D3D5" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Width="86"/>
+                <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" IsChecked="{Binding ShowPlatformsBeforeSelectingGame, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="3" Grid.Column="0" Content="Launch game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding LaunchGame, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="3" Grid.Column="0" Content="Launch game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="81"/>
+                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding LaunchGame, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="4" Grid.Column="0" Content="Only favorites" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding OnlyFavorites, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="4" Grid.Column="0" Content="Only favorites" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="83"/>
+                <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding OnlyFavorites, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="5" Grid.Column="0" Content="Hidden games" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding IncludeHidden, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="5" Content="Hidden games" Foreground="#D3D3D5" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Width="86"/>
+                <CheckBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding IncludeHidden, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="6" Grid.Column="0" Content="Broken games" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding IncludeBroken, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="6" Content="Broken games" Foreground="#D3D3D5" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Width="85"/>
+                <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding IncludeBroken, Mode=TwoWay}" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"/>
 
-                <Label Grid.Row="7" Grid.Column="0" Content="Platform" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <ComboBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2" Background="#343542" Foreground="#D3D3D5"
+                <Label Grid.Row="7" Grid.Column="0" Content="Platform" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="55"/>
+                <ComboBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"
                           ItemsSource="{Binding PlatformLookup}"
                           DisplayMemberPath="Name"
                           SelectedItem="{Binding SelectedPlatform, Mode=TwoWay}"/>
                 <Button Grid.Row="7" Grid.Column="4" Content="Clear" Command="{Binding ClearPlatformCommand}" 
-                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0" />
+                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0,0,4" Width="43" />
 
-                <Label Grid.Row="8" Grid.Column="0" Content="Playlist" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <ComboBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2" Background="#343542" Foreground="#D3D3D5"
+                <Label Grid.Row="8" Grid.Column="0" Content="Playlist" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="47"/>
+                <ComboBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"
                           ItemsSource="{Binding PlaylistLookup}"
                           DisplayMemberPath="Name"
                           SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}"/>
                 <Button Grid.Row="8" Grid.Column="4" Content="Clear" Command="{Binding ClearPlaylistCommand}" 
-                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0"/>
+                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0,0,2" Width="43"/>
 
-                <Label Grid.Row="9" Grid.Column="0" Content="Game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2" Background="#343542" Foreground="#D3D3D5"
+                <Label Grid.Row="9" Grid.Column="0" Content="Game" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="26" Width="41"/>
+                <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" Margin="10,2,10,2" Background="#343542" Foreground="#D3D3D5"
                           ItemsSource="{Binding GameLookup}"
                           DisplayMemberPath="Title"
                           SelectedItem="{Binding SelectedGame, Mode=TwoWay}"/>
                 <Button Grid.Row="9" Grid.Column="4" Content="Clear" Command="{Binding ClearGameCommand}" 
-                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0" />
+                        HorizontalAlignment="Left" Background="#3F404E" Foreground="#D3D3D5" Margin="2,0,0,8" Width="43" />
 
-                <StackPanel Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5"                             
-                            HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+                <StackPanel Grid.Row="10" Grid.Column="0" Margin="10,0,0,0"                             
+                            HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Height="26" Width="69">
                     <Label Content="Delay" Foreground="#D3D3D5" VerticalAlignment="Bottom"/>
                     <Label Content="{Binding DelayInSeconds}" ContentStringFormat="N1" Margin="2,0" 
                            Foreground="#D3D3D5" VerticalAlignment="Bottom"/>
                     <Label Content="s" Foreground="#D3D3D5" VerticalAlignment="Bottom"/>
                 </StackPanel>
-                <Slider Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,5" Name="StartupLoadDelaySlider"                        
+                <Slider Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,5,20,5" Name="StartupLoadDelaySlider"                        
                         Value="{Binding DelayInSeconds, Mode=TwoWay}"
-                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                         Minimum="0" Maximum="30" TickPlacement="BottomRight" TickFrequency="1" SmallChange="0.1" LargeChange="1.0"
                         IsSnapToTickEnabled="False"/>
 
-                <Label Grid.Row="12" Grid.Column="0" Content="Create server" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <CheckBox Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="4" IsChecked="{Binding CreateServer, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="12" Content="Server Enable" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="109" Grid.ColumnSpan="2" Margin="10,0,0,0"/>
+                <CheckBox Grid.Row="12" Grid.Column="1" IsChecked="{Binding ServerEnable, Mode=TwoWay}" Margin="15,4,311,25" Background="#343542" Foreground="#D3D3D5" Grid.RowSpan="2"/>
 
-                <Label Grid.Row="13" Grid.Column="0" Content="Server IP" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <TextBox Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding ServerIPAddress, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="12" Content="Multicast Enable" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26" Width="137" Margin="213,2,0,0" Grid.Column="1" Grid.RowSpan="2"/>
+                <CheckBox Grid.Row="12" Grid.Column="1" IsChecked="{Binding MulticastEnable, Mode=TwoWay}" Margin="350,5,85,23" Background="#343542" Foreground="#D3D3D5" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
 
-                <Label Grid.Row="14" Grid.Column="0" Content="Server port" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,2"/>
-                <TextBox Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding ServerPort, Mode=TwoWay}" Margin="10,2" Background="#343542" Foreground="#D3D3D5"/>
+                <Label Grid.Row="13" Grid.Column="0" Content="Server Port" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="25" Width="75"/>
+                <TextBox Grid.Row="13" Grid.Column="1" Text="{Binding ServerPort, Mode=TwoWay}" Margin="15,0,311,2" Background="#343542" Foreground="#D3D3D5"/>
+
+                <Label Grid.Row="13" Grid.Column="1" Content="Multicast IP" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="213,0,0,0" Height="25" Width="122"/>
+                <TextBox Grid.Row="13" Grid.Column="1" Text="{Binding MulticastAddress, Mode=TwoWay}" Margin="350,0,76,2" Background="#343542" Foreground="#D3D3D5" Grid.ColumnSpan="2"/>
+
+                <Label Grid.Row="15" Content="Remote Sync" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26" Width="109" Grid.ColumnSpan="2" Margin="10,19,0,0" Grid.RowSpan="2"/>
+                <CheckBox Grid.Row="15" Grid.Column="1" IsChecked="{Binding RemoteSync, Mode=TwoWay}" Margin="15,17,311,6" Background="#343542" Foreground="#D3D3D5"/>
+
+                <Label Grid.Row="16" Grid.Column="0" Content="Remote IP" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,14,0,0" Height="25" Width="75"/>
+                <TextBox Grid.Row="16" Grid.Column="1" Text="{Binding RemoteIPAddress, Mode=TwoWay}" Margin="15,10,311,4" Background="#343542" Foreground="#D3D3D5" />
+
+                <Label Grid.Row="17" Grid.Column="0" Content="Remote Port" Foreground="#D3D3D5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Height="24" Width="75"/>
+                <TextBox Grid.Row="17" Grid.Column="1" Text="{Binding RemotePort, Mode=TwoWay}" Margin="15,8,311,9" Background="#343542" Foreground="#D3D3D5" />
+
+
             </Grid>
         </Grid>
 

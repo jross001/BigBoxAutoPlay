@@ -256,20 +256,33 @@ namespace BigBoxAutoPlay.AutoPlayers
 
         public void LaunchGame()
         {
+            bool doLaunch = true;
+
             // bail out if we ain't got no settings
-            if (bigBoxAutoPlaySettings == null) return;
-
+            if (bigBoxAutoPlaySettings == null) 
+                doLaunch = false;
             // bail out if settings are disabled 
-            if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) return;
-
-            // bail out if launch game is not checked
-            if (!bigBoxAutoPlaySettings.LaunchGame.GetValueOrDefault()) return;
-
+            else if (!bigBoxAutoPlaySettings.Enabled.GetValueOrDefault()) 
+                doLaunch = false;
+            // 
+            else if (bigBoxAutoPlaySettings.LaunchGame.GetValueOrDefault() == false)
+            {
+                // bail out if neither launch game or remote sync is set
+                if (bigBoxAutoPlaySettings.RemoteSync.GetValueOrDefault() == false)
+                    doLaunch = false;
+                // bail if we're syncing with remote, but the remote didn't
+                // issue a start game
+                else if (bigBoxAutoPlaySettings.RemoteSync.GetValueOrDefault() == true &&
+                         bigBoxAutoPlaySettings.GameState != GameStateEnum.GAME_LAUNCHED)
+                    doLaunch = false;
+            }
             // bail out if the game is not resolved 
-            if (resolvedGame == null) return;
+            else if (resolvedGame == null) 
+                doLaunch = false;
 
             // launch the game
-            PluginHelper.BigBoxMainViewModel.PlayGame(resolvedGame, null, null, null);
+            if (doLaunch)
+                PluginHelper.BigBoxMainViewModel.PlayGame(resolvedGame, null, null, null);
         }
     }
 }

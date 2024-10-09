@@ -5,22 +5,33 @@ using BigBoxAutoPlay.Models;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
+using Unbroken.LaunchBox.Plugins.RetroAchievements;
+
 
 namespace BigBoxAutoPlay
 {
     public class BigBoxAutoPlayPlugin : ISystemEventsPlugin, IGameLaunchingPlugin
     {        
         private static Thread listenerThread;
-        private static TcpListener tcpListener;
+        private static UdpClient udpServer;
+        private static IPEndPoint serverEndpoint;
+        private static IPEndPoint remoteEndpoint;
         private static Dispatcher dispatcher;
         private static bool playingGame;
+        private static bool threadEnabled;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
         public void OnEventRaised(string eventType)
         {
@@ -55,9 +66,21 @@ namespace BigBoxAutoPlay
         {
             try
             {
-                tcpListener?.Server?.Close();
+                // Need to cleanup the spawned thread gracefully.
+                // closing the connection should cause an emtpy byte to
+                // be returned and the thread should exit the loop
+                threadEnabled = false;
+
+                udpServer?.Close();
+                udpServer?.Dispose();
+                udpServer = null;
+                serverEndpoint = null;
+                remoteEndpoint = null;
+
+                // wait for the listener tread to finish
+                listenerThread.Join(5000);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogHelper.LogException(ex, "CloseServer");
             }
@@ -96,26 +119,42 @@ namespace BigBoxAutoPlay
                 LogHelper.LogException(ex, "DoBackgroundDelay");
             }
         }
-
         private void CreateServer()
         {
-            try
-            {
-                BigBoxAutoPlaySettings bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+            BigBoxAutoPlaySettings bigBoxAutoPlaySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
 
-                if (bigBoxAutoPlaySettings?.CreateServer == true)
+            if ( bigBoxAutoPlaySettings?.ServerEnable == true )
+            {
+                IPAddress ipAddress = null;
+                int myPort        = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
+                int remotePort  = bigBoxAutoPlaySettings.RemotePort.GetValueOrDefault();  
+
+                try
                 {
-                    IPAddress ipAddress = IPAddress.Parse(bigBoxAutoPlaySettings.ServerIPAddress);
-                    int port = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
+                    udpServer = new UdpClient(myPort);
+                    serverEndpoint = new IPEndPoint(IPAddress.Any, myPort);
 
-                    // listenerThread = new Thread(() => StartListener(ipAddress, port, dispatcher));
-                    listenerThread = new Thread(() => StartListener(ipAddress, port));
-                    listenerThread.Start();
+                    if (bigBoxAutoPlaySettings.MulticastEnable == true)
+                    {
+                        ipAddress = IPAddress.Parse(bigBoxAutoPlaySettings.MulticastAddress);
+                        udpServer.JoinMulticastGroup(ipAddress);
+                    } else
+                    {
+                        ipAddress = IPAddress.Parse(bigBoxAutoPlaySettings.RemoteIPAddress);
+                    }
+
+                    remoteEndpoint = new IPEndPoint(ipAddress, myPort);
                 }
-            }
-            catch(Exception ex)
-            {
-                LogHelper.LogException(ex, "CreateServer");
+                catch (Exception ex)
+                {
+                    LogHelper.LogException(ex, "CreateServer");
+                    return;
+                }
+
+                // listenerThread = new Thread(() => StartListener(ipAddress, port, dispatcher));
+                threadEnabled = true;
+                listenerThread = new Thread(() => StartListener());
+                listenerThread.Start();
             }
         }
 
@@ -132,135 +171,96 @@ namespace BigBoxAutoPlay
         }
 
         // static void StartListener(IPAddress ipAddress, int port, Dispatcher dispatcher)
-        static void StartListener(IPAddress ipAddress, int port)
+        static void StartListener()
         {
-            TcpClient client = null;
-            NetworkStream stream = null;
             string receivedData = string.Empty;
-            BigBoxAutoPlaySettings bigBoxAutoPlaySettings = null;
+            BigBoxAutoPlaySettings mySettings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+            BigBoxAutoPlaySettings remoteSettings = null;
 
-            try
+            while (threadEnabled)
             {
-                tcpListener = new TcpListener(ipAddress, port);
-                tcpListener.Start();
-            }
-            catch (Exception ex)
-            {
-                tcpListener?.Stop();
-                tcpListener = null;
-                LogHelper.LogException(ex, "StartListener");
-            }
-
-            if (tcpListener == null) return;
-
-            while (true)
-            {                
+                // UDP receive
                 try
                 {
-                    // Accept the pending client connection
-                    client = tcpListener.AcceptTcpClient();
+                    // Read data from the client by blocking
+                    byte[] buffer = udpServer?.Receive(ref serverEndpoint);
+                    receivedData = Encoding.ASCII.GetString(buffer, 0, buffer.Length);
                 }
-                catch(Exception ex)
+                catch
                 {
-                    client = null;
-                    LogHelper.LogException(ex, "StartListener - Accept client");
+                    // an exception will happen when we cancel the blocking
+                    // operation on a call to UdpClient.close().  Its expected
+                    // so ignore it
+                    continue;
                 }
 
-                if (client == null) return;
-
-                try
-                {
-                    // Get the network stream for sending and receiving data
-                    stream = client.GetStream();
-                }
-                catch(Exception ex)
-                {
-                    stream = null;
-                    LogHelper.LogException(ex, "StartListener - Get stream");
-                }
-
-                if (stream == null) return;
-                                
-                try
-                {
-                    // Read data from the client
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    receivedData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                }
-                catch(Exception ex)
-                {
-                    receivedData = string.Empty;
-                    LogHelper.LogException(ex, "StartListener - Receive data");
-                }
-
-                if (receivedData == string.Empty) return;
-
+                // Happy path...
                 StringBuilder responseStringBuilder = new StringBuilder();
-                responseStringBuilder.AppendLine($"Recieved message: {receivedData}");
+                responseStringBuilder.AppendLine($"Received message: {receivedData}");
 
-                if (playingGame)
+                try
                 {
-                    responseStringBuilder.AppendLine("Cannot run while a game is playing");
-                }    
-
-                if (!playingGame)
+                    remoteSettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
+                }
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        bigBoxAutoPlaySettings = JsonConvert.DeserializeObject<BigBoxAutoPlaySettings>(receivedData);
-                    }
-                    catch (Exception ex)
-                    {
-                        bigBoxAutoPlaySettings = null;
-                        responseStringBuilder.AppendLine($"Error deserializing message: {ex.Message}");
-                        LogHelper.LogException(ex, $"StartListener - deserializing message\n{receivedData}");
-                    }
+                    remoteSettings = null;
+                    responseStringBuilder.AppendLine($"Error deserializing message: {ex.Message}");
+                    LogHelper.LogException(ex, $"StartListener - deserializing message\n{receivedData}");
+                }
 
-                    if (bigBoxAutoPlaySettings == null) return;
-
-                    try
+                if (remoteSettings != null)
+                {
+                    if (mySettings.RemoteSync == true)
                     {
-                        // autoplay from the provided settings - invoke via dispatcher so it runs under the BigBox UI thread
-                        dispatcher.Invoke(() =>
+                        if (playingGame && remoteSettings.GameState == GameStateEnum.GAME_EXITED)
                         {
-                            responseStringBuilder.AppendLine(BigBoxAutoPlayer.AutoPlayFromMessage(bigBoxAutoPlaySettings));
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        responseStringBuilder.AppendLine($"Error playing from message: {ex.Message}");
-                        LogHelper.LogException(ex, "StartListener - Autoplay");
-                    }
-                }
+                            // For multiple Networked Computers running BigBox
+                            // The Game has ended on the far end machine, end the
+                            // game here by sending the escape key. 
+                            //
+                            //invoke via dispatcher so it runs under the BigBox UI thread
+                            dispatcher.Invoke(() =>
+                            {
+                                ExitGame();
+                            });
+                        }
+                        else if (!playingGame && remoteSettings.GameState == GameStateEnum.GAME_LAUNCHED)
+                        {
+                            try
+                            {
+                                // autoplay from the provided settings - invoke via dispatcher so it runs under the BigBox UI thread
+                                dispatcher.Invoke(() =>
+                                {
+                                    responseStringBuilder.AppendLine(BigBoxAutoPlayer.AutoPlayFromMessage(remoteSettings));
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                // log the exception locally and send the response to the remote
+                                LogHelper.LogException(ex, "StartListener - Autoplay");
 
-                try
-                {
-                    SendResponse(stream, responseStringBuilder.ToString());
-                }
-                catch(Exception ex)
-                {
-                    LogHelper.LogException(ex, "StartListener - Send response");
-                }
-
-                try
-                {
-                    // Close the connection
-                    client?.Close();
-                }
-                catch(Exception ex)
-                {
-                    LogHelper.LogException(ex, "StartListener - close client");
+                                responseStringBuilder.AppendLine($"Error playing from message: {ex.Message}");
+                                SendResponse(responseStringBuilder.ToString());
+                            }
+                        }
+                    }                    
                 } 
+                else
+                {
+                    //send to client for debug
+                    SendResponse(responseStringBuilder.ToString());
+                }
             }
         }
 
-        static void SendResponse(NetworkStream stream, string response)
+        private static void SendResponse(string response)
         {
             try
-            {                
-                byte[] responseBuffer = Encoding.ASCII.GetBytes(response);
-                stream.Write(responseBuffer, 0, responseBuffer.Length);
+            {
+                // send the response
+                byte[] buffer = Encoding.ASCII.GetBytes(response);
+                udpServer?.Send(buffer, buffer.Length, remoteEndpoint);
             }
             catch (Exception ex)
             {
@@ -275,12 +275,84 @@ namespace BigBoxAutoPlay
 
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
+           
+            BigBoxAutoPlaySettings settings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+
+            // only send if AutoPlay is enabled
+            if ( settings?.Enabled == true && settings?.ServerEnable == true && settings?.RemoteSync == true)
+            {
+                // This game may have been either launched by the user or
+                // via autoplay.  In either case, alert the multicast group
+                // that we just started a game.
+                settings.FromPlaylist = "";
+                settings.FromPlaylistName = "";
+                settings.FromPlatform = "";
+                settings.GameTitle = "";
+
+                // limit how the base query in the remote will be formed
+                // sol that its only the game ID
+                settings.OnlyFavorites = false;
+                settings.IncludeBroken = false;
+                settings.IncludeHidden = false;
+                settings.SelectGame = false;
+                settings.ShowPlatformsBeforeSelectingGame = false;
+                settings.SpecificGameId = game.Id;
+                settings.DelayInSeconds = 0;
+
+                try
+                {
+                    settings.GameState = GameStateEnum.GAME_LAUNCHED;
+                    byte[] buffer = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(settings));
+                    udpServer?.Send(buffer, buffer.Length, remoteEndpoint);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogException(ex, "OnAfterGameLaunched");
+                }
+            }
+
             playingGame = true;
         }
 
         public void OnGameExited()
         {
+            BigBoxAutoPlaySettings settings = BigBoxAutoPlaySettingsDataService.Instance.GetSettings();
+
+            // only send if AutoPlay is enabled
+            if (settings?.Enabled == true && settings?.ServerEnable == true && settings?.RemoteSync == true)
+            {
+                try
+                {
+                    settings.GameState = GameStateEnum.GAME_EXITED;
+                    byte[] buffer = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(settings));
+                    udpServer?.Send(buffer, buffer.Length, remoteEndpoint);
+
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogException(ex, "OnGameExited");
+                }
+            }
             playingGame = false;
+        }
+
+        static void ExitGame()
+        {
+            const int  VK_ESCAPE                = 0x1B; //ESC key
+            const uint KEYEVENTF_KEYDOWN        = 0x0000; // New definition
+            const uint KEYEVENTF_KEYUP          = 0x0002;
+
+            try
+            {
+                //Press the key
+                keybd_event((byte)VK_ESCAPE, 0, (int)KEYEVENTF_KEYDOWN | 0, 0);
+                keybd_event((byte)VK_ESCAPE, 0, (int)KEYEVENTF_KEYUP | 0, 0);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "ExitGame");
+
+            }
         }
     }
 }

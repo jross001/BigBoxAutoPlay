@@ -152,10 +152,16 @@ namespace BigBoxAutoPlay.ViewModels
             IncludeHidden = bigBoxAutoPlaySettings.IncludeHidden.GetValueOrDefault();
             IncludeBroken = bigBoxAutoPlaySettings.IncludeBroken.GetValueOrDefault();                                    
             DelayInSeconds = bigBoxAutoPlaySettings.DelayInSeconds.GetValueOrDefault();
-            CreateServer = bigBoxAutoPlaySettings.CreateServer.GetValueOrDefault();
-            
+
+            ServerEnable = bigBoxAutoPlaySettings.ServerEnable.GetValueOrDefault();            
             ServerPort = bigBoxAutoPlaySettings.ServerPort.GetValueOrDefault();
-            ServerIPAddress = bigBoxAutoPlaySettings.ServerIPAddress;
+
+            RemoteSync = bigBoxAutoPlaySettings.RemoteSync.GetValueOrDefault();
+            RemoteIPAddress = bigBoxAutoPlaySettings.RemoteIPAddress;
+            RemotePort = bigBoxAutoPlaySettings.RemotePort.GetValueOrDefault();
+
+            MulticastEnable = bigBoxAutoPlaySettings.MulticastEnable.GetValueOrDefault();
+            MulticastAddress = bigBoxAutoPlaySettings.MulticastAddress;
 
             if (!string.IsNullOrWhiteSpace(bigBoxAutoPlaySettings.FromPlatform))
             {
@@ -302,13 +308,13 @@ namespace BigBoxAutoPlay.ViewModels
             }
         }
 
-        public bool CreateServer
+        public bool ServerEnable
         {
-            get => bigBoxAutoPlaySettings?.CreateServer == true;
+            get => bigBoxAutoPlaySettings?.ServerEnable == true;
             set
             {
-                bigBoxAutoPlaySettings.CreateServer = value;
-                OnPropertyChanged("CreateServer");
+                bigBoxAutoPlaySettings.ServerEnable = value;
+                OnPropertyChanged("ServerEnable");
             }
         }
 
@@ -331,14 +337,52 @@ namespace BigBoxAutoPlay.ViewModels
                 OnPropertyChanged("ServerPort");
             }
         }
-
-        public string ServerIPAddress
+        public bool RemoteSync
         {
-            get => bigBoxAutoPlaySettings?.ServerIPAddress;
+            get => bigBoxAutoPlaySettings?.RemoteSync == true;
             set
             {
-                bigBoxAutoPlaySettings.ServerIPAddress = value;
-                OnPropertyChanged("ServerIPAddress");
+                bigBoxAutoPlaySettings.RemoteSync = value;
+                OnPropertyChanged("RemoteSync");
+            }
+        }
+
+        public string RemoteIPAddress
+        {
+            get => bigBoxAutoPlaySettings?.RemoteIPAddress;
+            set
+            {
+                bigBoxAutoPlaySettings.RemoteIPAddress = value;
+                OnPropertyChanged("RemoteIPAddress");
+            }
+        }
+
+        public int RemotePort
+        {
+            get => bigBoxAutoPlaySettings?.RemotePort ?? 0;
+            set
+            {
+                bigBoxAutoPlaySettings.RemotePort = value;
+                OnPropertyChanged("RemotePort");
+            }
+        }
+        public bool MulticastEnable
+        {
+            get => bigBoxAutoPlaySettings?.MulticastEnable == true;
+            set
+            {
+                bigBoxAutoPlaySettings.MulticastEnable = value;
+                OnPropertyChanged("MulticastEnable");
+            }
+        }
+
+        public string MulticastAddress
+        {
+            get => bigBoxAutoPlaySettings?.MulticastAddress;
+            set
+            {
+                bigBoxAutoPlaySettings.MulticastAddress = value;
+                OnPropertyChanged("MulticastAddress");
             }
         }
     }

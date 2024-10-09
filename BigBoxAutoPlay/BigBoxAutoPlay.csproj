@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Users\Adam\Documents\LaunchBox\Plugins\&quot; /K /D /H /Y /E" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\LaunchBox\Plugins\&quot; /K /D /H /Y /E" />
   </Target>
 
 </Project>
